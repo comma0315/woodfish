@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电子木鱼·功德模拟器</title>
+    <style>
+        body {
+            background-color: #f0e8d9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        .counter {
+            text-align: center;
+            margin: 30px 0;
+            font-size: 24px;
+            color: #5a3921;
+        }
+
+        .counter .title {
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .counter .score {
+            margin-top: 10px;
+            font-size: 28px;
+            letter-spacing: 4px;
+        }
+
+        .muyu-container {
+            position: relative;
+            margin-top: 80px;
+            cursor: pointer;
+        }
+
+        .muyu-img {
+            width: 150px;
+            height: auto;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+        }
+
+        .hammer {
+            position: absolute;
+            width: 90px; /* 锤子尺寸放大为原来的2倍 */
+            height: auto;
+            top: -20px; /* 调整锤子初始位置 */
+            left: 22%;
+            transform: translateX(-50%) rotate(-30deg);
+            transition: transform 0.1s;
+            pointer-events: none;
+        }
+
+        .gongde-text {
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            font-weight: bold;
+            opacity: 0;
+            animation: floatUp 1s forwards;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translate(-50%, 0); }
+            100% { opacity: 0; transform: translate(-50%, -50px); }
+        }
+
+        @keyframes hammerHit {
+            0% { transform: translateX(-50%) rotate(-30deg); }
+            50% { transform: translateX(-50%) rotate(10deg); }
+            100% { transform: translateX(-50%) rotate(-30deg); }
+        }
+
+        @keyframes muyuShake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-2px); }
+            50% { transform: translateX(2px); }
+            75% { transform: translateX(-2px); }
+            100% { transform: translateX(0); }
+        }
+
+        .hammer-hit { animation: hammerHit 0.3s ease-in-out; }
+        .muyu-shake { animation: muyuShake 0.3s ease-in-out; }
+    </style>
+</head>
+<body>
+    <div class="counter">
+        <div class="title">今日功德</div>
+        <div class="score">-<span id="score">0</span>-</div>
+    </div>
+
+    <div class="muyu-container">
+        <img src="https://i.postimg.cc/cCw8x4DR/image.png" class="muyu-img" id="muyu">
+        <img src="https://i.postimg.cc/q7wNZ39C/image.png" class="hammer" id="hammer">
+    </div>
+
+    <script>
+        let score = 0;
+        const scoreElement = document.getElementById('score');
+        const muyu = document.getElementById('muyu');
+        const hammer = document.getElementById('hammer');
+
+        // 随机文字配置
+        const messages = [
+            { text: '功德＋1', color: '#c53d13', value: 1 },
+            { text: '快乐＋1', color: '#13c58f', value: 0 },
+            { text: '功德-1', color: '#1345c5', value: -1 }
+        ];
+
+        function updateScore(value) {
+            score += value;
+            scoreElement.textContent = score;
+        }
+
+        function createFloatingText(text, color) {
+            const textElement = document.createElement('div');
+            textElement.className = 'gongde-text';
+            textElement.textContent = text;
+            textElement.style.color = color;
+            
+            document.querySelector('.muyu-container').appendChild(textElement);
+            
+            textElement.addEventListener('animationend', () => {
+                textElement.remove();
+            });
+        }
+
+        function playAnimations() {
+            // 锤子敲击动画
+            hammer.classList.add('hammer-hit');
+            setTimeout(() => hammer.classList.remove('hammer-hit'), 300);
+
+            // 木鱼震动动画
+            muyu.classList.add('muyu-shake');
+            setTimeout(() => muyu.classList.remove('muyu-shake'), 300);
+        }
+
+        function handleClick() {
+            const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+            updateScore(randomMsg.value);
+            createFloatingText(randomMsg.text, randomMsg.color);
+            playAnimations();
+        }
+
+        // 事件监听
+        muyu.addEventListener('click', handleClick);
+        muyu.addEventListener('touchend', handleClick);
+    </script>
+</body>
+</html>
